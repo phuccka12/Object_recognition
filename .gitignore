@@ -1,0 +1,198 @@
+# AI Object Detection Studio - Git Ignore File
+
+# ========================
+# Python & Virtual Environment
+# ========================
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ========================
+# AI Models & Data
+# ========================
+# Large model files (custom models)
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.engine
+*.weights
+
+# Training data
+data/
+datasets/
+images/
+videos/
+
+# Temporary detection files
+temp_*.jpg
+temp_*.png
+temp_processed.*
+
+# ========================
+# Application Specific
+# ========================
+# Output files
+outputs/
+results/
+batch_results/
+exports/
+
+# Logs & Statistics
+logs/
+*.log
+stats_*.csv
+stats_*.json
+
+# Screenshots & recordings
+screenshots/
+recordings/
+
+# ========================
+# IDE & Editor
+# ========================
+# PyCharm
+.idea/
+.pycharm_helpers/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Spyder
+.spyderproject
+.spyproject
+
+# ========================
+# OS Generated
+# ========================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================
+# Package Managers
+# ========================
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Poetry
+poetry.lock
+
+# Pipenv
+Pipfile.lock
+
+# ========================
+# Testing & Coverage
+# ========================
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+cover/
+*.cover
+*.py,cover
+.hypothesis/
+
+# ========================
+# Documentation
+# ========================
+docs/_build/
+.readthedocs.yml
+
+# ========================
+# Backup & Temporary
+# ========================
+# Backup files
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# Auto-generated files
+*.orig
+*.rej
+
+# ========================
+# KEEP THESE FILES
+# ========================
+# Keep empty model directory with placeholder
+!models/
+!models/.gitkeep
+
+# Keep sample images (if any)
+!sample_images/
+!examples/
+
+# Keep documentation
+!docs/
+!*.md
+!LICENSE
