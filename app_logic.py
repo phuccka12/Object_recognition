@@ -22,15 +22,17 @@ detection_stats = {
 }
 
 # Danh sách các model có sẵn và đường dẫn của chúng
-AVAILABLE_MODELS = {
-    "Tổng quát (COCO)": "yolov8n.pt",
-    "Ẩm thực Việt (Custom)": "models/best.pt"
-}
+# Mặc định: chỉ dùng model custom của bạn (models/best.pt). COCO đã được loại bỏ theo yêu cầu.
+AVAILABLE_MODELS = {}
 
 def switch_model(model_name):
     """Hàm để chuyển đổi giữa các model."""
     global model
     model_path = AVAILABLE_MODELS.get(model_name)
+    # Nếu model_name là một đường dẫn file .pt trực tiếp
+    if model_path is None and (os.path.exists(model_name) and model_name.lower().endswith('.pt')):
+        model_path = model_name
+
     if model_path:
         print(f"Đang chuyển sang model: {model_path}...")
         try:
@@ -44,21 +46,97 @@ def switch_model(model_name):
         print(f"Lỗi: Không tìm thấy model tên là '{model_name}'")
         return False
 
+
+def load_model_file(file_path, register=True):
+    """Load một file model .pt trực tiếp và (tuỳ chọn) đăng ký vào AVAILABLE_MODELS.
+
+    Trả về khoá (name) đã thêm vào AVAILABLE_MODELS khi thành công, hoặc False khi thất bại.
+    """
+    global model
+    if not os.path.exists(file_path):
+        print(f"File không tồn tại: {file_path}")
+        return False
+
+    try:
+        print(f"Loading model from file: {file_path} ...")
+        loaded = YOLO(file_path)
+        model = loaded
+        # Đăng ký model vào AVAILABLE_MODELS nếu yêu cầu
+        if register:
+            base = os.path.basename(file_path)
+            name = os.path.splitext(base)[0]
+            key = f"Custom ({name})"
+            # ensure unique key
+            suffix = 1
+            orig_key = key
+            while key in AVAILABLE_MODELS:
+                suffix += 1
+                key = f"{orig_key}-{suffix}"
+            AVAILABLE_MODELS[key] = file_path
+            print(f"Đăng ký model dưới tên: {key}")
+            return key
+
+        return True
+    except Exception as e:
+        print(f"Lỗi khi load model từ file: {e}")
+        return False
+
 def set_confidence_threshold(confidence):
     """Cập nhật confidence threshold"""
     global current_confidence
     current_confidence = max(0.1, min(0.9, confidence))
 
-def get_model_info():
-    """Trả về thông tin model hiện tại"""
-    if model is None:
-        return {"name": "Chưa tải model", "classes": 0, "class_names": []}
-    
-    return {
-        "name": "Model hiện tại",
-        "classes": len(model.names) if hasattr(model, 'names') else 0,
-        "class_names": list(model.names.values()) if hasattr(model, 'names') else []
-    }
+def get_model_info(model_key=None):
+    """Trả về thông tin model hiện tại hoặc model được chỉ định bởi `model_key`.
+
+    Trả về dict có các trường: name, classes, class_names, path, file_size
+    """
+    info = {"name": "Chưa tải model", "classes": 0, "class_names": [], "path": None, "file_size": None}
+
+    # Nếu người gọi truyền model_key (là key trong AVAILABLE_MODELS), lấy path từ đó
+    model_path = None
+    if model_key:
+        if model_key in AVAILABLE_MODELS:
+            model_path = AVAILABLE_MODELS.get(model_key)
+            info['name'] = model_key
+    # Nếu không có key, nhưng có model đã load, cố lấy tên lớp từ object
+    if model is not None:
+        info['name'] = info.get('name') or 'Model hiện tại'
+        try:
+            if hasattr(model, 'names'):
+                # model.names có thể là dict {id: name}
+                names = model.names
+                if isinstance(names, dict):
+                    info['class_names'] = [v for k, v in sorted(names.items())]
+                else:
+                    info['class_names'] = list(names)
+                info['classes'] = len(info['class_names'])
+        except Exception:
+            pass
+
+    # Nếu có đường dẫn file (từ AVAILABLE_MODELS hoặc model_path), bổ sung kích thước
+    if model_path:
+        info['path'] = model_path
+        try:
+            if os.path.exists(model_path):
+                info['file_size'] = f"{os.path.getsize(model_path) / (1024*1024):.2f} MB"
+        except Exception:
+            pass
+    else:
+        # Nếu không có model_path nhưng AVAILABLE_MODELS chỉ có một target, cố lấy từ đó
+        try:
+            if not model_path and AVAILABLE_MODELS:
+                # if only one model registered, pick that path
+                # otherwise leave path None
+                if len(AVAILABLE_MODELS) == 1:
+                    only_path = list(AVAILABLE_MODELS.values())[0]
+                    info['path'] = only_path
+                    if os.path.exists(only_path):
+                        info['file_size'] = f"{os.path.getsize(only_path) / (1024*1024):.2f} MB"
+        except Exception:
+            pass
+
+    return info
 
 def get_detection_stats():
     """Trả về thống kê detection"""
@@ -112,8 +190,17 @@ def export_stats_to_json(filename):
         return False
 
 # Khởi động với model mặc định
-print("Đang tải model mặc định...")
-switch_model("Tổng quát (COCO)")
+print("Khởi động: chỉ dùng model local. Kiểm tra models/best.pt ...")
+if os.path.exists("models/best.pt"):
+    # Đăng ký model custom mặc định
+    AVAILABLE_MODELS.clear()
+    AVAILABLE_MODELS["Custom (best)"] = "models/best.pt"
+    if not switch_model("Custom (best)"):
+        print("Không thể tải models/best.pt — kiểm tra file hoặc tải model mới bằng nút 'Load .pt'.")
+else:
+    # Không tự động tải COCO hay model từ mạng — người dùng sẽ load model bằng tay
+    AVAILABLE_MODELS.clear()
+    print("Chưa tìm thấy models/best.pt. Vui lòng đặt file 'best.pt' vào thư mục 'models/' hoặc dùng nút 'Load .pt' trong giao diện.")
 
 def detect_objects_in_image(image_path):
     """Nhận diện đối tượng trong ảnh tĩnh"""

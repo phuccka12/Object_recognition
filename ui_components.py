@@ -67,66 +67,7 @@ class DashboardPanel:
         self.update_dashboard()
         messagebox.showinfo("🔄 Reset", "Đã reset thống kê")
 
-class ImageProcessingPanel:
-    def __init__(self, parent_frame, callback):
-        self.parent = parent_frame
-        self.callback = callback
-        self.setup_processing()
-    
-    def setup_processing(self):
-        """Thiết lập controls xử lý ảnh"""
-        title = ctk.CTkLabel(self.parent, text="🎨 XỬ LÝ ẢNH", font=ctk.CTkFont(size=14, weight="bold"))
-        title.pack(pady=5)
-        
-        # Controls row 1
-        controls = ctk.CTkFrame(self.parent, fg_color="transparent")
-        controls.pack(fill=ctk.X, padx=10, pady=5)
-        
-        # Brightness
-        ctk.CTkLabel(controls, text="Sáng:", width=50).pack(side=ctk.LEFT, padx=2)
-        self.brightness_slider = ctk.CTkSlider(controls, from_=0.5, to=2.0, width=80, command=self.on_change)
-        self.brightness_slider.set(1.0)
-        self.brightness_slider.pack(side=ctk.LEFT, padx=2)
-        
-        # Contrast
-        ctk.CTkLabel(controls, text="Tương phản:", width=80).pack(side=ctk.LEFT, padx=2)
-        self.contrast_slider = ctk.CTkSlider(controls, from_=0.5, to=2.0, width=80, command=self.on_change)
-        self.contrast_slider.set(1.0)
-        self.contrast_slider.pack(side=ctk.LEFT, padx=2)
-        
-        # Sharpness
-        ctk.CTkLabel(controls, text="Sắc nét:", width=60).pack(side=ctk.LEFT, padx=2)
-        self.sharpness_slider = ctk.CTkSlider(controls, from_=0.0, to=3.0, width=80, command=self.on_change)
-        self.sharpness_slider.set(1.0)
-        self.sharpness_slider.pack(side=ctk.LEFT, padx=2)
-        
-        # Controls row 2
-        controls2 = ctk.CTkFrame(self.parent, fg_color="transparent")
-        controls2.pack(fill=ctk.X, padx=10, pady=5)
-        
-        # Filter
-        ctk.CTkLabel(controls2, text="Bộ lọc:").pack(side=ctk.LEFT, padx=2)
-        self.filter_combo = ctk.CTkComboBox(controls2, values=["Không", "Blur", "Sharpen", "Edge Enhance", "Emboss"], 
-                                           width=100, command=self.on_change)
-        self.filter_combo.set("Không")
-        self.filter_combo.pack(side=ctk.LEFT, padx=5)
-        
-        # Reset button
-        ctk.CTkButton(controls2, text="🔄 Reset", command=self.reset_processing, width=60).pack(side=ctk.LEFT, padx=5)
-    
-    def on_change(self, value=None):
-        """Callback khi các giá trị thay đổi"""
-        if self.callback:
-            self.callback()
-    
-    def reset_processing(self):
-        """Reset xử lý ảnh"""
-        self.brightness_slider.set(1.0)
-        self.contrast_slider.set(1.0)
-        self.sharpness_slider.set(1.0)
-        self.filter_combo.set("Không")
-        if self.callback:
-            self.callback()
+# Image processing UI removed — per-image adjustment controls were removed from the application.
 
 class AdvancedFeaturesPanel:
     def __init__(self, parent_frame, app_instance):
@@ -172,3 +113,10 @@ class AdvancedFeaturesPanel:
             folder = filedialog.askdirectory()
             if folder:
                 self.app.run_batch_processing(files, folder)
+
+
+
+
+
+
+                

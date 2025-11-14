@@ -1,4 +1,4 @@
-# AI Object Detection Studio v6.1 - Requirements
+    # AI Object Detection Studio v6.1 - Requirements
 # Cài đặt: pip install -r requirements.txt
 
 # Core AI & Computer Vision
